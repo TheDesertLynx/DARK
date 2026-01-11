@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <script src="https://unpkg.com/@dashpay/dash@latest/dist/dash.min.js"></script> <!-- Dash SDK -->
+</head>
+<body>
+    <h1 id="title">Loading...</h1>
+    <img id="image" alt="Image" width="200">
+    <p id="text">Loading...</p>
+    <div id="htmlContent"></div> <!-- Optional if you add htmlContent later -->
+
+    <script>
+        async function loadContent() {
+            const client = new Dash.Client({
+                network: 'testnet', // Change to 'mainnet' for production
+                apps: {
+                    myContract: { // Arbitrary app name
+                        contractId: 'HnNVSS2byYwjH2BmoTLUJG94xtoDNihBBzWVvh8c5TGD', // Your new contract ID
+                    },
+                },
+            });
+
+            const query = {
+                where: [['$id', '==', '7zKXjwznWb1SefA5myoeUWDpeNg5vzCT3vrmrtk4RppN']], // Your specific document ID
+            };
+
+            const documents = await client.platform.documents.get(
+                'myContract.page', // App name + document type
+                query,
+            );
+
+            if (documents.length > 0) {
+                const doc = documents[0].toJSON();
+                document.getElementById('title').innerText = doc.metadata?.title || 'DARK Project'; // Default if no metadata
+                document.getElementById('image').src = doc.image || ''; // URL string
+                document.getElementById('text').innerText = doc.text || 'No text available';
+
+                // Optional: If you add htmlContent to future documents
+                document.getElementById('htmlContent').innerHTML = doc.htmlContent || '';
+            } else {
+                console.error('No document found');
+                document.body.innerHTML = '<p>Error: No content found.</p>';
+            }
+        }
+
+        loadContent().catch(console.error);
+    </script>
+</body>
+</html>

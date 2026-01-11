@@ -10,7 +10,8 @@
     <h1 id="title">Loading...</h1>
     <img id="image" alt="Image" width="200">
     <p id="text">Loading...</p>
-    <div id="htmlContent"></div> <!-- Optional if you add htmlContent later -->
+    <!-- Remove or comment out the div if not using htmlContent for display -->
+    <!-- <div id="htmlContent"></div> -->
 
     <script>
         function loadContent() {
@@ -40,7 +41,8 @@
                         document.getElementById('title').innerText = doc.metadata?.title || 'DARK Project';
                         document.getElementById('image').src = doc.image || '';
                         document.getElementById('text').innerText = doc.text || 'No text available';
-                        document.getElementById('htmlContent').innerHTML = doc.htmlContent || '';
+                        // Comment out or remove this line to avoid rendering the backup HTML
+                        // document.getElementById('htmlContent').innerHTML = doc.htmlContent || '';
                     } else {
                         document.body.innerHTML = '<p>No content found.</p>';
                     }

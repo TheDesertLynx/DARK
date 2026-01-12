@@ -4,14 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading...</title>
-    <script src="https://unpkg.com/dash@latest/dist/dash.min.js"></script> <!-- Correct Dash SDK URL -->
+    <script src="https://unpkg.com/dash@latest/dist/dash.min.js"></script> <!-- Dash SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- For Markdown rendering if used -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: black; /* Black background */
+            color: white; /* White text */
+            text-align: center; /* Centered content */
+            margin: 0;
+            padding: 20px;
+        }
+        img {
+            width: 400px; /* Twice as big (assuming original was 200px) */
+            display: block;
+            margin: 0 auto; /* Centered image */
+        }
+        .portrait { flex-direction: column; }
+        .landscape { flex-direction: row; }
+        /* Add more layout classes as needed */
+    </style>
 </head>
-<body>
+<body id="body">
     <h1 id="title">Loading...</h1>
-    <img id="image" alt="Image" width="200">
+    <img id="image" alt="Image" src="">
     <p id="text">Loading...</p>
-    <!-- Remove or comment out the div if not using htmlContent for display -->
-    <!-- <div id="htmlContent"></div> -->
+    <div id="formattedContent"></div>
+    <div id="additionalText"></div>
+    <div id="htmlContent"></div> <!-- Optional for backup rendering -->
 
     <script>
         function loadContent() {
@@ -25,23 +45,42 @@
                 network: 'testnet',
                 apps: {
                     myContract: {
-                        contractId: 'HnNVSS2byYwjH2BmoTLUJG94xtoDNihBBzWVvh8c5TGD', // Your contract ID
+                        contractId: 'XJMWN5fHC8p2BjHbWJvyBegj575DNhQTGSghpN2ToFk', // Your new contract ID
                     },
                 },
             });
 
             const query = {
-                where: [['$id', '==', '7zKXjwznWb1SefA5myoeUWDpeNg5vzCT3vrmrtk4RppN']], // Your document ID
+                where: [['$id', '==', 'Dj68wM7QRA4vvCZXaXqmkH7Kmfmvy76esg2pNBtuGtuP']], // Your document ID
             };
 
             client.platform.documents.get('myContract.page', query)
                 .then(documents => {
                     if (documents.length > 0) {
                         const doc = documents[0].toJSON();
-                        document.getElementById('title').innerText = doc.metadata?.title || 'DARK Project';
+                        
+                        // Metadata handling
+                        const meta = doc.metadata || {};
+                        document.getElementById('title').innerText = meta.title || 'DARK Project';
+                        document.title = meta.title || 'DARK Project'; // Browser title
+                        
+                        // Apply layout/orientation from metadata
+                        const layout = meta.layout || 'portrait';
+                        document.body.classList.add(layout);
+
+                        // Image
                         document.getElementById('image').src = doc.image || '';
-                        document.getElementById('text').innerText = doc.text || 'No text available';
-                        // Comment out or remove this line to avoid rendering the backup HTML
+
+                        // Text (with potential Markdown/HTML parsing)
+                        document.getElementById('text').innerHTML = marked.parse(doc.text || 'No text available');
+
+                        // Formatted Content
+                        document.getElementById('formattedContent').innerHTML = marked.parse(doc.formattedContent || '');
+
+                        // Additional Text
+                        document.getElementById('additionalText').innerHTML = marked.parse(doc.additionalText || '');
+
+                        // HTML Content (backup - optional rendering)
                         // document.getElementById('htmlContent').innerHTML = doc.htmlContent || '';
                     } else {
                         document.body.innerHTML = '<p>No content found.</p>';
@@ -53,7 +92,6 @@
                 });
         }
 
-        // Call after page load to ensure SDK is ready
         window.addEventListener('load', loadContent);
     </script>
 </body>
